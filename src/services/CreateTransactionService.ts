@@ -17,17 +17,13 @@ class CreateTransactionService {
 
   public execute({ title, value, type }: Request): Transaction {
 
-    if (type == 'outcome' && value >= this.transactionsRepository.value){
-      throw Error('insulficient funds')
-    }
-
     const transaction = this.transactionsRepository.create({
-        title,
-        value,
-        type
-    })
+      title,
+      value,
+      type,
+    });
 
-    return transaction
+    return transaction;
   }
 }
 

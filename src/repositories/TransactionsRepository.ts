@@ -18,43 +18,50 @@ class TransactionsRepository {
   private transactions: Transaction[];
 
   constructor() {
-    this.transactions = [];
+    this.transactions = []
   }
 
   public all(): Transaction[] {
-     return this.transactions
+    return this.transactions;
   }
 
   public getBalance(): Balance {
+    const income = this.transactions.filter(
+      transaction => transaction.type == 'income',
+    );
+    const outcome = this.transactions.filter(
+      transaction => transaction.type == 'outcome',
+    );
 
+    const sumIncome = income.reduce(
+      (sum, { value }: { value: number }) => sum + value,
+      0,
+    );
+    const sumOutcome = outcome.reduce(
+      (sum, { value }: { value: number }) => sum + value,
+      0,
+    );
 
-    const income = this.transactions.filter(transaction => transaction.type == 'income')
-    const outcome = this.transactions.filter(transaction => transaction.type == 'outcome')
+    const balance = {
+      income: sumIncome,
+      outcome: sumOutcome,
+      total: sumIncome - sumOutcome,
+    };
 
-   const sumIncome = income.reduce( ( sum, { value } : { value: number } ) => sum + value , 0)
-   const sumOutcome = outcome.reduce( ( sum, { value } : { value: number } ) => sum + value , 0)
-
-   const balance =
-     {
-      balance: {
-        income: sumIncome,
-        outcome: sumOutcome,
-        total: (sumIncome - sumOutcome),
-      }
-   }
-
-   this.transactions.push(balance)
-   return balance
-    // const sumIncome = income.reduce((total, num) =>  total.value + num.value)
-    // const sumOutcome = outcome.reduce((total, num) => total + num)
+    return balance;
   }
 
   public create({ title, value, type }: CreateTransactionDTO): Transaction {
-    const transaction = new Transaction({ title, value, type })
+    const transaction = new Transaction({ title, value, type });
 
-    this.transactions.push(transaction)
+    const { total } = this.getBalance();
+    if (type == 'outcome' && value >= total) {
+      throw Error('insuficient funds')
+    }
 
-    return transaction
+    this.transactions.push(transaction);
+
+    return transaction;
   }
 }
 

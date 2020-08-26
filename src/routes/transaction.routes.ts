@@ -1,11 +1,7 @@
 import { Router } from 'express';
 
-import TransactionsRepository from '../repositories/TransactionsRepository'
-import CreateTransactionService from '../services/CreateTransactionService'
-import Transaction from '../models/Transaction';
-
-// import TransactionsRepository from '../repositories/TransactionsRepository';
-// import CreateTransactionService from '../services/CreateTransactionService';
+import TransactionsRepository from '../repositories/TransactionsRepository';
+import CreateTransactionService from '../services/CreateTransactionService';
 
 const transactionRouter = Router();
 
@@ -13,29 +9,29 @@ const transactionsRepository = new TransactionsRepository();
 
 transactionRouter.get('/', (request, response) => {
   try {
+    const transactions = transactionsRepository.all();
+    const balance = transactionsRepository.getBalance();
 
-    const transactions = transactionsRepository.all()
-    transactionsRepository.getBalance()
-    // const add = transactionsRepository.getBalance()
-    // transactions.push(add)
-    // const transactionsWithBalance = [...transactions, transactionsRepository.getBalance()]
-    return response.json(transactions)
+    return response.json({ transactions, balance });
   } catch (err) {
     return response.status(400).json({ error: err.message });
   }
 });
 
 transactionRouter.post('/', (request, response) => {
+  const { title, value, type } = request.body;
   try {
-      const { title, value, type } = request.body
+    if (type !== 'income' && type !== 'outcome') {
+      throw Error('enter a valid type: income or outcome');
+    }
 
-      const createTransaction = new CreateTransactionService(transactionsRepository)
+    const createTransaction = new CreateTransactionService(
+      transactionsRepository,
+    );
 
-      const transaction = createTransaction.execute({ title, value, type })
+    const transaction = createTransaction.execute({ title, value, type });
 
-
-      return response.json(transaction)
-
+    return response.json(transaction);
   } catch (err) {
     return response.status(400).json({ error: err.message });
   }
