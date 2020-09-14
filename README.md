@@ -1,7 +1,7 @@
 <img alt="GoStack" src="https://res.cloudinary.com/stefanosaffran/image/upload/v1586943536/d32tomvl6x8onypta01h.png" />
 
 <h3 align="center">
-  Desafio 02 - Node.js conceitos.
+  Desafio 05 - Backend em Node.js.
 </h3>
 
 <p align="center">
